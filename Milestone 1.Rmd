@@ -1,0 +1,73 @@
+---
+title: "Milestone 1"
+author: "Tori Bonisese"
+date: "2/11/2018"
+author email: victoria.bonisese@emory.edu
+output:
+  word_document: default
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## The Penalization Problem: Is Previous Performance Indicative of Future Performance?
+
+My Master's thesis investigates how penalization from a Medicaire pay-for-performance program, the Hospital Acquired Conditions Reduction Program (HACRP), is distributed across safety-net and non-safety net hospitals. I am passionate about this topic because I am interested in healthcare quality improvement, but while keeping in mind our system's most vulnerable. Policy often has unintended consequences, and this analysis serves to investiage potential undesireable consequences resulting from the HACRP. 
+
+Safety-net hospitals care for vulnerable populations, operate at a low margin, and may have higher rates of hospital-acquired conditions than other hospitals simply due to their patient mix. This question is relevant in today's health policy climate as focus shifts from volume to value based care and cost containment becomes an increasing priority. The intent of a pay-for-performance program is to increase quality of care while cutting or containing cost, and while both of these objectives are positive, the potential implications from a disproportiante penalization of safety-net hospitals are not. If financially strained safety-net hospitals find their Medicare reimbursement further reduced by pay-for-performance programs like the HACRP it is possible that they may not be able to gather the resources to improve care enough to escape the penalty threshold.
+
+**Objective**
+This will be a sub-analysis of my thesis - it is likely I will be asked during my defense if prior penalization is predicitive of future performance and, rather than do this analysis in STATA, I will use this project to answer that question. In addition, this question is important to me because it highlights the concern that lower performing hospitals may never escape penalization regardless of improvement. This needs to be addressed as incentives may need to be adjusted in future policy.
+## Safety-net Definition and Demographics
+Include HCUP stats
+
+## Literature Review: Pay-for-Performance and HAC/HACRP Background
+Include VBP and HRRP
+
+## Methods
+Data is gathered from the Center for Medicare and Medicaid Services' (CMS)  Hospital Compare website  [https://www.medicare.gov/hospitalcompare/HAC-reduction-program.html](https://www.medicare.gov/hospitalcompare/HAC-reduction-program.html), [https://data.medicare.gov/data/archives/hospital-compare](https://data.medicare.gov/data/archives/hospital-compare), and CMS's Inpatient Prospective System for years 2016-2017 [https://www.cms.gov/Medicare/Medicare-Fee-for-Service-Payment/AcuteInpatientPPS/FY2016-IPPS-Final-Rule-Home-Page.html](https://www.cms.gov/Medicare/Medicare-Fee-for-Service-Payment/AcuteInpatientPPS/FY2016-IPPS-Final-Rule-Home-Page.html),  [https://www.cms.gov/Medicare/Medicare-Fee-for-Service-Payment/AcuteInpatientPPS/FY2017-IPPS-Final-Rule-Home-Page.html](https://www.cms.gov/Medicare/Medicare-Fee-for-Service-Payment/AcuteInpatientPPS/FY2017-IPPS-Final-Rule-Home-Page.html).
+
+My git repository regarding this project can be found here [https://github.com/vbonise/Final-Project.git](https://github.com/vbonise/Final-Project.git)
+All hospitals subject to the HACRP that recieved a score were included in analysis. Data has been cleaned for analysis in SAS/STATA, but I can demonstrate skills learned in class by re-organizing/re-naming and re-merging datasets if that is desired. I anticipate needing to understand basic summary statistics before moving forward with my regression.
+    
+**Conceptual framework** to explain covariates and confounders and inclusion/exclusion criteria
+
+**Hypothesis** previous penalization is predictive of subsequent penaliztion as the scoring methodolgy utilizes the aggregate of all hospital performance to set penalization threshold and it is reasonable to expect that hospitals improve each year. If all hospitals improve by 10% then a penalized hospital may need to improve by 20% to cross the threshold. 
+    
+**Analytic strategy**
+    Logistic regression assessing the odds of penalization in 2017 for hospitals penalized in 2016 
+    Pr(Penalization=1) = B~0~ + B~1~X~S~ + B~2~X~T~ + B~3~X~C~ + E
+    Where X~S~ represents safety-net hospitals, X~T~ represents teaching hospitals and X~C~ is a vector of covariates. 
+    
+    **Schedule**
+    Week of 2/19: import data into R and familarize myself with the dataset
+    Week of 2/26: continue to data wrangle and write manuscript draft
+    Week of 3/5: analyze logistic regression and include results & descrpitive stats in manuscript
+    Week of 3/15: deliver Milestone 2
+    Weeks of 3/26-4/19: correct and improve Milestone 2 until it is in a finalized condition and submit
+                        Also create website during this time? Need more info on this before I can schedule.
+    Week of 4/16-4/23: create and practice presentation
+    
+**Strengths and Limitations**
+
+## Results
+
+**Descriptive Statistics**
+Possibly use xtable or kable?
+```{r, echo=FALSE}
+library(xtable)
+library(dplyr)
+```
+Mock table not currently using an R table package:
+
+**Regression Results**
+Possibly use xtable or kable?
+Mock table not currently using an R table package:
+
+## Conclusion
+
+## Discussion
+    
