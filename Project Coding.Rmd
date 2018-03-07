@@ -1,0 +1,54 @@
+---
+title: "Project Coding"
+author: "Tori"
+date: "March 7, 2018"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Git Repo
+[https://github.com/vbonise/Final-Project.git](https://github.com/vbonise/Final-Project.git)
+
+##Import Data
+```{r}
+library(haven)
+FinalScores_All3Years <- read_dta("FinalScores_All3Years.dta")
+View(FinalScores_All3Years)
+```
+
+##Create Indicators for Fine by Year
+```{r create indicators}
+library(dplyr)
+FinalScores_Indicators <- FinalScores_All3Years %>%
+  mutate(fine15 = ifelse(fine==1 & fiscal_year == 2015, 1,0)) %>%
+  mutate(fine16 = ifelse(fine==1 & fiscal_year == 2016, 1,0)) %>%
+  mutate(fine17 = ifelse(fine==1 & fiscal_year == 2017, 1,0)) %>%
+  mutate(fine1617 = ifelse(fine==1 & fine17==1, 1,0))
+```
+##Try out the logistic regression
+```{r logit}
+library(aod)
+library(ggplot2)
+##need to subset the data for those fined in 2015
+FinalScores_Subset15 <- select(filter(FinalScores_Indicators, fine15==1), c(fine, fine15, fine16, fine17, fine1617, dsh, teach, urban, beds_small, beds_medium, beds_large, readmiss_fine, vbp_fine))
+
+##now to test the logit
+testlogit <- glm(fine16 ~ dsh + teach + urban + beds_medium + beds_large +readmiss_fine + vbp_fine, data = FinalScores_Subset15, family=binomial(link="logit"))
+
+predicted <- predict(testlogit, FinalScores_Subset15, type = "response")
+
+predictedplogis <- plogis(predict(testlogit, FinalScores_Subset15))
+
+```
+Ideas for logisitc regression:
+if fined in 2015:
+odds of being fined in 2016
+odds of being fined in 2017
+odds of being fined in both
+
+create indicator varis for all
