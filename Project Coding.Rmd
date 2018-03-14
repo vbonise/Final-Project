@@ -28,7 +28,32 @@ FinalScores_Indicators <- FinalScores_All3Years %>%
   mutate(fine15 = ifelse(fine==1 & fiscal_year == 2015, 1,0)) %>%
   mutate(fine16 = ifelse(fine==1 & fiscal_year == 2016, 1,0)) %>%
   mutate(fine17 = ifelse(fine==1 & fiscal_year == 2017, 1,0)) %>%
-  mutate(fine1617 = ifelse(fine==1 & fine17==1, 1,0))
+  mutate(fine1617 = ifelse(fine16==1 & fine17==1, 1, 0))
+
+##test
+frequency <- select(FinalScores_Indicators, fine15, fine16, fine17, fine1617)
+
+##frequencies
+attach(FinalScores_Indicators)
+mytable <- table(fine15, fine16)
+
+
+##need to transform from long to wide, but first need to subset
+##subset
+library(dplyr)
+FinalScores_Subset <- select(FinalScores_All3Years, provider_id, fiscal_year, fine, dsh, teach, urban, beds_small, beds_medium, beds_large, readmiss_fine, vbp_fine)%>%filter(provider_id == 10001)
+
+
+
+##transform from long to wide
+##BOOK yaRrr and r cookbook
+library(car)
+test <- head(FinalScores_All3Years)
+library(readr)
+library(reshape2)
+###FinalScoresWide <- melt(FinalScores_All3Years, id= "provider_id", "fiscal_year")
+widetest <- dcast(test, provider_id ~ fiscal_year, value.var = "fine")
+FinalScores_Wide <- dcast(FinalScores_All3Years, provider_id ~ fiscal_year, value.var = "fine")
 ```
 ##Try out the logistic regression
 ```{r logit}
