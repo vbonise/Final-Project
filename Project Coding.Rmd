@@ -22,7 +22,8 @@ View(FinalScores_All3Years)
 ```
 
 ##Create Indicators for Fine by Year
-```{r create indicators}
+##Don't do this, but don't delete code because it is good reference
+{r create indicators}
 library(dplyr)
 FinalScores_Indicators <- FinalScores_All3Years %>%
   mutate(fine15 = ifelse(fine==1 & fiscal_year == 2015, 1,0)) %>%
@@ -37,39 +38,79 @@ frequency <- select(FinalScores_Indicators, fine15, fine16, fine17, fine1617)
 attach(FinalScores_Indicators)
 mytable <- table(fine15, fine16)
 
-
+##Also don't need this anymore
 ##need to transform from long to wide, but first need to subset
 ##subset
 library(dplyr)
 FinalScores_Subset <- select(FinalScores_All3Years, provider_id, fiscal_year, fine, dsh, teach, urban, beds_small, beds_medium, beds_large, readmiss_fine, vbp_fine)%>%filter(provider_id == 10001)
-
-
+```
 
 ##transform from long to wide
 ##BOOK yaRrr and r cookbook
+```{r}
 library(car)
 test <- head(FinalScores_All3Years)
-library(readr)
-library(reshape2)
+
 ###FinalScoresWide <- melt(FinalScores_All3Years, id= "provider_id", "fiscal_year")
 widetest <- dcast(test, provider_id ~ fiscal_year, value.var = "fine")
 FinalScores_Wide <- dcast(FinalScores_All3Years, provider_id ~ fiscal_year, value.var = "fine")
+
+##relabel vars so I can append to original dataset
+library(dplyr)
+relabel_test <- select(widetest, 2015 = fine15, 2016 = fine16, 2017 = fine17)
+relabel_test <- rename(widetest, 2015 = fine15)
+relabel_test <- rename(widetest, c(2015, 2016, 2017), c("fine15","fine16","fine17"))
+
+##didnt work, try with base r
+colnames(widetest)[2] <- "fine15"
+colnames(widetest)[3] <- "fine16"
+colnames(widetest)[4] <- "fine17"
+
+##do for actual dataset
+colnames(FinalScores_Wide) [2] <- "fine15"
+colnames(FinalScores_Wide) [3] <- "fine16"
+colnames(FinalScores_Wide) [4] <- "fine17"
+
+##Attempt to merge to original dataset
+total <- merge(FinalScores_All3Years,FinalScores_Wide,by="provider_id")
+
+##Check to see if worked
+frequencies15 <- table(fine, fine15)
+frequencies15
+
+frequencies16 <- table(fine, fine16)
+frequencies16
+
+frequencies17 <- table(fine, fine17)
+frequencies17
+
+##Create indicators using old code above now that data is wide
+total <- mutate(total, fine_all = (if_else (fine15 == 1 & fine16 ==1 & fine17 == 1, 1, 0)))
+test_all <- select(total, fine, fine_all)
 ```
+
 ##Try out the logistic regression
 ```{r logit}
 library(aod)
 library(ggplot2)
 ##need to subset the data for those fined in 2015
-FinalScores_Subset15 <- select(filter(FinalScores_Indicators, fine15==1), c(fine, fine15, fine16, fine17, fine1617, dsh, teach, urban, beds_small, beds_medium, beds_large, readmiss_fine, vbp_fine))
+FinalScores_Subset15 <- select(filter(total, fine15==1), c(provider_id, fiscal_year, fine, fine15, fine16, fine17, dsh, teach, urban, beds_small, beds_medium, beds_large, readmiss_fine, vbp_fine))
 
 ##now to test the logit
 testlogit <- glm(fine16 ~ dsh + teach + urban + beds_medium + beds_large +readmiss_fine + vbp_fine, data = FinalScores_Subset15, family=binomial(link="logit"))
 
-predicted <- predict(testlogit, FinalScores_Subset15, type = "response")
+logit17 <- glm(fine17 ~ dsh + teach + urban + beds_medium + beds_large +readmiss_fine + vbp_fine, data = FinalScores_Subset15, family=binomial(link="logit"))
 
-predictedplogis <- plogis(predict(testlogit, FinalScores_Subset15))
+logit_all <- glm(fine_all ~ dsh + teach + urban + beds_medium + beds_large +readmiss_fine + vbp_fine, data = total, family=binomial(link="logit"))
+
+##get ORs
+exp(coef(testlogit))
+exp(coef(logit17))
+exp(coef(logit_all))
+
 
 ```
+
 Ideas for logisitc regression:
 if fined in 2015:
 odds of being fined in 2016
