@@ -1,7 +1,7 @@
 ---
-title: "Project Coding"
-author: "Tori"
-date: "March 7, 2018"
+title: "Milestone 2"
+author: "Tori Bonisese"
+date: "March 28, 2018"
 output:
   word_document: default
   html_document: default
@@ -11,110 +11,136 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Git Repo
+# Git Repo
 [https://github.com/vbonise/Final-Project.git](https://github.com/vbonise/Final-Project.git)
 
-##Import Data
+# Data Sources
+Data is gathered from the Center for Medicare and Medicaid Services' (CMS)  Hospital Compare website  [https://www.medicare.gov/hospitalcompare/HAC-reduction-program.html](https://www.medicare.gov/hospitalcompare/HAC-reduction-program.html), [https://data.medicare.gov/data/archives/hospital-compare](https://data.medicare.gov/data/archives/hospital-compare), and CMS's Inpatient Prospective System for years 2016-2017 [https://www.cms.gov/Medicare/Medicare-Fee-for-Service-Payment/AcuteInpatientPPS/FY2016-IPPS-Final-Rule-Home-Page.html](https://www.cms.gov/Medicare/Medicare-Fee-for-Service-Payment/AcuteInpatientPPS/FY2016-IPPS-Final-Rule-Home-Page.html),  [https://www.cms.gov/Medicare/Medicare-Fee-for-Service-Payment/AcuteInpatientPPS/FY2017-IPPS-Final-Rule-Home-Page.html](https://www.cms.gov/Medicare/Medicare-Fee-for-Service-Payment/AcuteInpatientPPS/FY2017-IPPS-Final-Rule-Home-Page.html).
+
+
+#Explanation of process thus far:
+**Objective**
+This will be a sub-analysis of my thesis - I am interested to know if prior penalization is predicitive of future performance and, rather than do this analysis in STATA, I will use this project to answer that question. In addition, this question is important to me because it highlights the concern that lower performing hospitals may never escape penalization regardless of improvement. This needs to be addressed as incentives may need to be adjusted in future policy.
+
+**Workflow**
+I acquired my data from Hospital Compare and CMS and did a majority of the data cleaning for my thesis in SAS and Stata. For this particular project I took a dataset from my thesis that combined data from Hospital Compare and the Inpatient Prospective System from CMS. First, I ran descriptive statistics to get a "picure" of my data. I used chi-square analysis and t-tests to assess differences between safety-net and non-safety-net hospitals as safety-net hospitals are my focal variable. These tables are documented below and the descriptive statistics are as expected. 
+In order to answer my question of how penalization of a safety-net hospital in one year affects odds of penalization in the following year, I needed to take my dataset from its long format to wide. I needed to do this because I am interested in how many times a hospital was fined from 2015-2017 and, as far as I know, R "thinks" across and then down, so to know the number of penalizations by provider ID I need to have the penalization years horizonatally adjacent to eachother rather than vertically. I used the reshape2 package to change the data from long to wide, and then merged the resuts back onto the controls so that I could run the logisitc regression. Next, I created two subsets of data - one for 2015 and one for 2016. These subsets were created conditional on a hospital being penalized in 2015 and 2016, respectively. Subsetting the data allows me to isolate penalized hospitals and run a logistic regression to assess the odds of penalization in the following year. The subsets and logistic regressions are documented below. Lastly, I converted my results to odds ratios as they are much easier to interpret and explain to an audience. I do not have any ancillary questions yet, but I'm sure I will as time progresses.
+
+#Import Data & Call Packages
 ```{r}
 library(haven)
+library(car)
+library(reshape2)
+library(aod)
+library(ggplot2)
+library(dplyr)
 FinalScores_All3Years <- read_dta("FinalScores_All3Years.dta")
 View(FinalScores_All3Years)
 ```
 
-##Create Indicators for Fine by Year
-##Don't do this, but don't delete code because it is good reference
-{r create indicators}
-library(dplyr)
-FinalScores_Indicators <- FinalScores_All3Years %>%
-  mutate(fine15 = ifelse(fine==1 & fiscal_year == 2015, 1,0)) %>%
-  mutate(fine16 = ifelse(fine==1 & fiscal_year == 2016, 1,0)) %>%
-  mutate(fine17 = ifelse(fine==1 & fiscal_year == 2017, 1,0)) %>%
-  mutate(fine1617 = ifelse(fine16==1 & fine17==1, 1, 0))
+##Descriptive Stats
+###I am doing this to understand the data distribution and stats 
+```{r}
+library(gmodels)
+invisible(table(FinalScores_All3Years$dshpct))
+invisible(table(FinalScores_All3Years$teach, FinalScores_All3Years$dshpct))
+invisible(table(FinalScores_All3Years$beds_small, FinalScores_All3Years$dshpct))
+invisible(table(FinalScores_All3Years$beds_medium, FinalScores_All3Years$dshpct))
+invisible(table(FinalScores_All3Years$beds_large, FinalScores_All3Years$dshpct))
+tapply(FinalScores_All3Years$cmi, FinalScores_All3Years$dshpct, mean)
+invisible(table(FinalScores_All3Years$urban, FinalScores_All3Years$dshpct))
 
-##test
-frequency <- select(FinalScores_Indicators, fine15, fine16, fine17, fine1617)
+##Now do cross tabs with pvals
+CrossTable(FinalScores_All3Years$dshpct, FinalScores_All3Years$teach, chisq=TRUE, format="SAS")
+CrossTable(FinalScores_All3Years$dshpct, FinalScores_All3Years$beds_small, chisq = TRUE)
+CrossTable(FinalScores_All3Years$dshpct, FinalScores_All3Years$beds_medium, chisq = TRUE)
+CrossTable(FinalScores_All3Years$dshpct, FinalScores_All3Years$beds_large, chisq = TRUE)
+CrossTable(FinalScores_All3Years$dshpct, FinalScores_All3Years$urban, chisq = TRUE)
+CrossTable(FinalScores_All3Years$dshpct, FinalScores_All3Years$vbp_fine, chisq = TRUE)
+CrossTable(FinalScores_All3Years$dshpct, FinalScores_All3Years$readmiss_fine, chisq = TRUE)
+CrossTable(FinalScores_All3Years$dshpct, FinalScores_All3Years$fine, chisq = TRUE)
+t.test(cmi~dshpct, data = FinalScores_All3Years)
 
-##frequencies
-attach(FinalScores_Indicators)
-mytable <- table(fine15, fine16)
-
-##Also don't need this anymore
-##need to transform from long to wide, but first need to subset
-##subset
-library(dplyr)
-FinalScores_Subset <- select(FinalScores_All3Years, provider_id, fiscal_year, fine, dsh, teach, urban, beds_small, beds_medium, beds_large, readmiss_fine, vbp_fine)%>%filter(provider_id == 10001)
 ```
 
-##transform from long to wide
-##BOOK yaRrr and r cookbook
+##Descriptive Stat Tables:
+
+
+
+
+
+
+
+##Transform from long to wide
+###Here I am transforming from long to wide so that I can sum the number of times a hospital has been fined across 2015-2017.
 ```{r}
-library(car)
+
 test <- head(FinalScores_All3Years)
 
 ###FinalScoresWide <- melt(FinalScores_All3Years, id= "provider_id", "fiscal_year")
 widetest <- dcast(test, provider_id ~ fiscal_year, value.var = "fine")
 FinalScores_Wide <- dcast(FinalScores_All3Years, provider_id ~ fiscal_year, value.var = "fine")
 
-##relabel vars so I can append to original dataset
-library(dplyr)
-relabel_test <- select(widetest, 2015 = fine15, 2016 = fine16, 2017 = fine17)
-relabel_test <- rename(widetest, 2015 = fine15)
-relabel_test <- rename(widetest, c(2015, 2016, 2017), c("fine15","fine16","fine17"))
-
-##didnt work, try with base r
+##Relabel to append to original dataset
 colnames(widetest)[2] <- "fine15"
 colnames(widetest)[3] <- "fine16"
 colnames(widetest)[4] <- "fine17"
 
-##do for actual dataset
+##do for actual dataset, not just test
 colnames(FinalScores_Wide) [2] <- "fine15"
 colnames(FinalScores_Wide) [3] <- "fine16"
 colnames(FinalScores_Wide) [4] <- "fine17"
 
-##Attempt to merge to original dataset
+##Merge to original dataset
 total <- merge(FinalScores_All3Years,FinalScores_Wide,by="provider_id")
 
 ##Check to see if worked
-frequencies15 <- table(fine, fine15)
-frequencies15
-
-frequencies16 <- table(fine, fine16)
-frequencies16
-
-frequencies17 <- table(fine, fine17)
-frequencies17
+library(Hmisc)
+describe(FinalScores_Wide)
+###there are distinct 0 & 1 for all values of fine
+table(FinalScores_Wide$fine15)
+table(FinalScores_Wide$fine16)
+table(FinalScores_Wide$fine17)
 
 ##Create indicators using old code above now that data is wide
 total <- mutate(total, fine_all = (if_else (fine15 == 1 & fine16 ==1 & fine17 == 1, 1, 0)))
 test_all <- select(total, fine, fine_all)
+describe(test_all)
+table(total$fine_all)
 ```
 
-##Try out the logistic regression
+##Do logistic regression
 ```{r logit}
-library(aod)
-library(ggplot2)
-##need to subset the data for those fined in 2015
+##Need to subset the data for those fined in 2015
+##I am doing this because I am interested in the odds of a safety-net hospital being fined in 2016 conditional on their being fined in 2015
 FinalScores_Subset15 <- select(filter(total, fine15==1), c(provider_id, fiscal_year, fine, fine15, fine16, fine17, dsh, teach, urban, beds_small, beds_medium, beds_large, readmiss_fine, vbp_fine))
 
-##now to test the logit
-testlogit <- glm(fine16 ~ dsh + teach + urban + beds_medium + beds_large +readmiss_fine + vbp_fine, data = FinalScores_Subset15, family=binomial(link="logit"))
+#Need to subset the data for those fined in 2016
+##I am doing this because I am interested in the odds of a safety-net hospital being fined in 2017 conditional on their being fined in 2016
+FinalScores_Subset16 <- select(filter(total, fine16==1), c(provider_id, fiscal_year, fine, fine15, fine16, fine17, dsh, teach, urban, beds_small, beds_medium, beds_large, readmiss_fine, vbp_fine))
 
-logit17 <- glm(fine17 ~ dsh + teach + urban + beds_medium + beds_large +readmiss_fine + vbp_fine, data = FinalScores_Subset15, family=binomial(link="logit"))
+#Now, run logits
 
+##Odds of being fined in 2016 after being fined in 2015
+logit16 <- glm(fine16 ~ dsh + teach + urban + beds_medium + beds_large +readmiss_fine + vbp_fine, data = FinalScores_Subset15, family=binomial(link="logit"))
+
+summary(logit16)
+
+##Odds of being fined in 2017 after being fined in 2016
+logit17 <- glm(fine17 ~ dsh + teach + urban + beds_medium + beds_large +readmiss_fine + vbp_fine, data = FinalScores_Subset16, family=binomial(link="logit"))
+
+summary(logit17)
+
+##This logit will assess the odds of safety-net hospitals being fined in all 3 years
 logit_all <- glm(fine_all ~ dsh + teach + urban + beds_medium + beds_large +readmiss_fine + vbp_fine, data = total, family=binomial(link="logit"))
 
-##get ORs
-exp(coef(testlogit))
+summary(logit_all)
+
+#get ORs
+exp(coef(logit16))
 exp(coef(logit17))
 exp(coef(logit_all))
 
-
+#Tables will be placed below, along with interpretation and discussion
 ```
 
-Ideas for logisitc regression:
-if fined in 2015:
-odds of being fined in 2016
-odds of being fined in 2017
-odds of being fined in both
-
-create indicator varis for all
