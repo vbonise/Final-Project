@@ -63,13 +63,7 @@ t.test(cmi~dshpct, data = FinalScores_All3Years)
 
 ```
 
-##Descriptive Stat Tables:
-
-
-
-
-
-
+##Descriptive Stat Tables for Milestone 3:
 
 ##Transform from long to wide
 ###Here I am transforming from long to wide so that I can sum the number of times a hospital has been fined across 2015-2017.
@@ -141,6 +135,6 @@ exp(coef(logit16))
 exp(coef(logit17))
 exp(coef(logit_all))
 
-#Tables will be placed below, along with interpretation and discussion
 ```
 
+#Tables will be placed below, along with interpretation and discussion
