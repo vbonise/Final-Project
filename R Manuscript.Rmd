@@ -1,0 +1,200 @@
+---
+title: 'Paying for Performance: How is the Hospital Acquired Conditions Reduction
+  Program Affecting Safety-Net Hospitals? (Manuscript, R Markdown Version)'
+author: "Tori Bonisese"
+date: "5/02/2018"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+**Citations will be in word copy of manuscript, I was unable to make them work in R**
+
+##Abstract
+The Centers for Medicare and Medicaid Services' (CMS) Hospital Acquired Conditions Reduction Program (HACRP) is a pay-for-performance program that ranks and penalizes hospitals based upon their hospital acquired condition rates. Research on pay-for-performance programs has indicated that safety-net hospitals are disproportionately fined compared to their non-safety-net counterparts. This has led to concern that pay-for-performance policies widen the gap between safety-net and non-safety-net hospitals. Though research has been done on other pay-for-performance programs, it is unclear if hospitals are repeatedly penalized and how penalization by the HACRP is distributed among the variable of interest, safety-net hospitals. The purpose of this study is to examine the liklihood of subsequent penalization - that is penalzation in two sequential years, by hospital safety-net status. HACRP performance data (2015-2017) was gathered from Hospital Compare. Hospital characteristics were gathered from the CMS Inpatient Prospective System. Logistic regression was used to examine odds of subsequent penalization by the HACRP. Safety-net hospitals fined in 2016 are 1.90 times more likely to be fined in 2017 than non-safety-net hospitals, and safety-net hospitals are 2.31 times more likely to be fined in three years (2015-2017) of the HACRP than non-safety-net hospitals. This analysis indicates that safety-net hospitals have increased odds of multiple penalizations by the HACRP. 
+
+
+##I. Introduction
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The Affordable Care Act (ACA) may be best known for its individual insurance mandate, but the law is also responsible for the institution of new methods of payment reform and quality improvement. Changing the way Medicare reimburses hospitals for their services was deemed necessary in order to curb increased healthcare spending and promote higher quality care. To do this, the ACA introduced many reforms, three of which are pay-for-performance programs that alter Medicare reimbursement rates based on quality measures. Two of these programs, Value Based Purchasing (VBP) and the Hospital Readmissions Reduction Program (HRRP), were introduced in fiscal year (FY) 2013, and the third program, the Hospital Acquired Conditions Reduction Program (HACRP) was implemented in FY 2015.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;VBP is a payment system designed to incentivize quality improvement by rewarding hospitals for the quality of care they provide to Medicare patients; quality is measured by the adherence to clinical best practice, patient experience and mortality rates of patients with selected diagnoses. This program redistributes the funds saved from cutting reimbursement to lower scoring hospitals by increasing reimbursement to higher scoring hospitals. Similarly, the HRRP aims to increase quality of inpatient care by reducing payments to hospitals with excess readmissions. The HACRP reduces Medicare reimbursement to hospitals with the worst performance on various hospital acquired conditions (HAC) measures. While improved quality and decreased costs are positive changes, there is evidence to support they may be disproportionally affecting safety-net hospitals.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;While most of the literature on previous HAC-related programs address overall effectiveness, there has been little to no investigation into how these programs affect safety-net hospitals. There is evidence that safety-net hospitals, defined as those with a high Medicaid caseload, have both greater rates of HACs and lower rates of improvement in quality measures over time. This trend may be inherent to the nature of a safety-net hospital rather than a result of sub-par care. Safety-net hospitals serve a relatively poor population that is largely uninsured or insured via Medicaid and, as a result, is less able to access regular care.  If the new HACRP policy disproportionally affects safety-net hospitals, and this is compounded by other pay-for-performance programs and upcoming DSH payment cuts, safety-net hospitals may suffer a substantial funding reduction that could create or further widen quality disparities. 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This study will contribute to the literature on pay-for-performance programs and their effect on safety-net hospitals by investigating how likely safety-net hospitals are to be repeatedly fined by the HACRP. Examination of the HACRP is important because safety-net hospitals are vital to the healthcare of many communities and are already facing systematic funding cuts regardless of their performance. If this newest pay-for performance program does disproportionally affect safety-net hospitals via increased odds of repeated penalization, then the social cost of fining safety-net hospitals needs to be weighed against the benefit of potential quality improvement. 
+
+  
+##II. Background
+
+**a.	Safety-Net Hospitals**
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; There is no consensus on what constitutes a safety-net hospital, but recent studies have defined safety-net status using Medicare disproportionate-share hospital (DSH) patient percentage or Medicaid caseload. DSH patient percentage is defined by (Medicare Supplemental Security Income Days/Total Medicare Days) + (Medicaid, Non-Medicare Days/Total Patient Days.) This formula encompasses a hospital's Medicare patients who are eligible for Supplemental Security Income (SSI) and a hospital's Medicaid caseload. SSI is given to those who qualify based on the determination that Social Security Income and other sources of income are not enough to meet basic needs. Researchers have examined safety-net hospitals for decades, and results indicate these hospitals have many of the same characteristics. Safety-net hospitals are more likely to have fewer registered-nurses (RNs), along with fewer hospitalists, privileged physicians and full-time personnel. In addition, a 2014 analysis on failure to rescue (FTR), or the failure to recognize and mitigate mortality from a surgical complication, found that safety-net hospitals had higher odds of FTR than non-safety-net hospitals, and were less likely to have a fully implemented electronic medical record (EMR.) Similarly, a study by Hoehn et al. examined surgical outcomes and found that safety-net hospitals had higher odds of mortality for 3 out of 9 procedures studied, higher odds of readmissions for 2 procedures, and the highest cost of care for 7 of 9 procedures. It was also found that safety-net hospitals had the highest proportion of emergency cases, longer length of stay and higher rates of surgical complications. 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; In addition to lower staffing levels and higher odds of poor outcomes, a 2016 study conducted by Hoehn et al., referenced above, found the population in safety-net hospitals was more likely to be of low socioeconomic status and have high severity of illness. This finding reinforces a 2014 report by the Healthcare Cost and Utilization Project (HCUP) which notes that 41.2% of patients at safety-net hospitals are in the lowest income quartile. This report also found that 27.4% of safety-net hospitals are located in a large central metropolitan area and, compared to non-safety net hospitals, patient admissions were more likely to be for mental-health related disorders such as schizophrenia. Safety-net patient demographics reported in a recent analysis on the Hospital Readmissions Reduction Program noted that the typical safety-net hospital patient was less likely to be white and more likely to be dual-eligible for Medicaid. Due to their tendency to be under resourced and serve a more complex case-mix, it is reasonable to hypothesize that safety-net hospitals will perform worse than non-safety-net hospitals on hospital-acquired condition metrics and, consequently, the HACRP.
+
+**b. HACRP Design & Eligible Hospitals**
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; While the Hospital Acquired Conditions Reduction Program (HACRP) is the most recent ACA-related pay-for-performance initiative, it is not the first reimbursement related program that addresses HACs. In 2008, a Hospital Acquired Conditions program was instituted to stop Medicare reimbursement to hospitals for specified conditions not present on admission.  This policy, referred to as the Hospital Acquired Conditions (Present on Admissions Indicator) was created to reduce cost and improve quality. The policy targeted multiple hospital related conditions but those that are of interest to this analysis are hospital- acquired infections CAUTI and CLABSI, which are also targets of the 2015 HAC program. For correctness and consistency, when referring to CAUTI and CLABSI, I will use the term hospital-acquired infection (HAI) because these infections are caused by a pathogen whereas a hospital-acquired condition does not have to be caused by a pathogen (e.g. pressure ulcers.)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The literature on the effectiveness of the 2008 policy at reducing CAUTI and CLABSI rates examines various timeframes and datasets, but no general consensus has been reached. While some studies find the policy had no effect on the targeted infections, others find the policy significantly reduced both CAUTI and CLABSI rates. This lack of consensus brings into question the effectiveness of the policy and supports further analysis to understand if these policies are achieving their goals of improving quality.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; In addition to the 2008 HAC policy it is important to note an additional, ongoing, program aimed at reducing hospital-acquired conditions. CMS's Partnership for Patients (PfP) program was established in 2011 by the Affordable Care Act with the goal of reducing all-cause patient harm.   The program is a public-private partnership that employs the use of Hospital Improvement Innovation Networks (HIINs) to provide resources and collaboration with over 4,000 US hospitals on ways to reduce patient harm.33 A Health and Human Services (HHS) report notes that the timeframe for which this PfP program was active, there was a 21% drop in HACs (2010-2015), but HHS was not able to conclude this drop was a direct result of the program.  The lack of a concrete correlation between the program and decreased HAC rates supports the rationale for further investigation of the HACRP, a CMS program designed to reduce HACs. 
+
+**c.	HACRP Design and Eligible Hospitals**
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The HACRP policy excludes children's hospitals, long-term acute care hospitals, inpatient rehab facilities, inpatient psychiatric facilities, and cancer hospitals.  All eligible hospitals are given a HAC score that ranges from 1-10 with a higher score being less desirable, and hospitals that score above the 75th percentile are penalized.  This scoring is developed from a combination of quality data from the Agency for Healthcare Research and Quality (AHRQ) and the CDC's National Healthcare Safety Network (NHSN). The AHRQ portion of the data is referred to as the Patient Safety Indicator Composite (PSI 90) and is calculated using Medicare claims discharge data.  The PSI 90 composite is composed of eight PSIs for FYs 2015-2016 and was updated to include 10 PSIs in 2016,  however this updated PSI was not utilized in HAC scoring until FY 2017. The changes removed PSI 07 due to its duplication in NHSN data as CLABSI and added PSIs 10 and 11; PSIs 08 and 15 have different descriptions than in prior years but measure the same condition. 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The NHSN portion of the data is used to determine CAUTI and CLABSI rates for FY 2015, CAUTI, CLABSI and Surgical Site Infection (SSI) rates for FY 2016, and MRSA and Clostridium difficile rates for FY 2017. The weighting of AHRQ PSI 90 and NHSN data changes each year such that in FY 2015 the weighting was 35% PSI 90 (Domain 1) and 65% NHSN data for CAUTI and CLABSI (Domain 2.) This changed to 25% and 75% for FY 2016 and changed again to 15% and 85% for FY 2017.  The increasing emphasis on Domain 2 weights the majority of the hospital's score on a select few HACs rather than acting as a comprehensive evaluation of quality.
+
+**d.	Current Literature**
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A 2015 study by Kahn et al. examined the characteristics of hospitals that were penalized by any of the ACA-related pay-for-performance programs (VBP, HRRP and HACRP). This study focused on all US hospitals eligible for VBP, HRRP, and HACRP-related payment reductions and utilized data from Hospital Compare and the FY 2015 final rule tables from CMS. Hospital safety-net status was determined using the top fifty percent of Medicare DSH payments. Focusing on the HAC Reduction Program, Kahn et al. found that nearly half of hospitals penalized for FY 2015 were major teaching hospitals, and more than one third of those hospitals were considered to be safety-net hospitals. 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Similar to these results, a study by Rajaram et al. utilized data from Hospital Compare for hospitals' HAC scores and obtained hospital characteristics from the American Hospital Association (AHA) Annual Survey and the CMS Payment Impact File for 2015. This study found that teaching hospitals and safety-net hospitals were fined most often: of the 820 safety-net hospitals subject to the program, 28.3% were penalized versus only 19.9% of the 2,462 non-safety-net hospitals. 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; In a study similar to that of Kahn et al., Figueroa et al. examine all three ACA-related pay-for-performance policies to find if there are definitive characteristics of hospitals most likely to be fined. Researchers utilized publicly available data for all program analyses and calculated the odds of a hospital being penalized by hospital characteristics (i.e., teaching status, size, safety-net status, location, ownership status, and whether the hospital had an ICU.) Hospitals were classified into three groups ranging from least penalized to most penalized and it was found that, with respect to the HACRP, safety-net hospitals were twice as likely to be in the most penalized group (32.8%) compared to the least penalized group (16.9%.) In addition, as with previous studies, it was found that the adjusted odds of being most penalized were 2.17 (95% CI 1.23 to 3.83.) for major teaching hospitals and 1.96 for safety-net hospitals (95% CI 1.46 to 2.63.) 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; These analyses suggest that the HACRP is impacting safety-net hospitals more than non-safety-net hospitals, but they do not examine multiple years of the HACRP or rates of HACs targeted by the program. This analysis will expound upon current literature through the use of three years of HACRP data as well as analysis of the distribution of repeated penalization. Literature has established that safety-net hospitals have a different patient population, case mix, staffing levels and, sometimes, resources, so it is warranted that safety-net hospitals are studied separately from their non-safety-net counterparts when examining policy implications. While policy is often well intended, it is possible for negative externalities to result and, thus, it is imperative that effects of policies be thoroughly analyzed.
+
+##III. Hypothesis Formulation
+
+**a. Safety-net Status as a Moderator**
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; As mentioned previously, literature suggests that safety-net hospitals have higher rates of hospital acquired conditions and lower rates of improvement in quality measures over time. This finding may be due to issues with staffing or high case mix index as discussed in the confounders section below, but provides evidence as to why safety-net status may weaken the effect of a quality improvement program like the HACRP. An example of a hospital's safety-net status moderation of the relationship between a policy and improvement because of lack of financial resources and human capital. If a hospital is unable to implement adequate staff due to lack of funding, they may be less likely to leverage quality improvement tools available to them. If a hospital is unable to improve their quality of care, they may experience higher infection rates and, thus be penalized more frequently by the HACRP. For these reasons, it is hypothesized that safety-net status moderates (weakens) the relationship between the HACRP and penalization such that safety-net hospitals will not be able to react to penalization by improving quality to the same degree as non-safety-net hospitals. 
+
+**b. Hypothesis**
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *The relationship between the HACRP and penalty rates is moderated by safety-net status.* Safety-net hospitals will be penalized in 2015 will have higher odds of being penalized in subsequent years than non-safety-net hospitals.
+
+## IV. Methods
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; To examine the relationship between hospital safety-net status and penalization by the HACRP, three years of data (2015-2017) comprised of acute care hospitals participating in Medicare will be used. These data consist of hospitals and their performance scores, with the worst performing quartile of hospitals receiving a penalization. Data will be subset by penalization in 2015 and penalization in 2016 to examine odds of penalization after previous penalization. A logisitc regression will be used to examine this relationship. The model is:
+Pr(Penalization =1) = B~0~ + B~1~S~j~ + B~2~T + B~3~C + E,
+where Sj represents hospital safety-net status, T represents hospital teaching status and C represents a vector of control variables.  All analyses were performed in Stata Version 15 and R studio.
+
+**a. Measured Confounders**
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The following variables are measureable and hypothesized to have a confounding effect on the focal relationships. A hospital's teaching status is defined by the presence of a residency program and is classified as non-teaching or teaching. As previously stated, literature has established there is a relationship between teaching status and penalization by pay-for-performance programs and thus examination of hospital teaching status is of interest in this analysis. Teaching status will be included as a confounder for both focal relationships, despite risk adjustment for affiliation with a medical school in the HACRP penalization algorithm. Similarly, hospital bed number will also be included despite some risk adjusting regarding hospital size. These inclusions are in line with previous literature. 
+
+**b. Unmeasured Confounders**
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Unmeasured confounders include effects of the 2008 Medicare HAC-related policy, checklists and toolkits, mandated NHSN reporting, the use of NHSN data to improve healthcare-associated infection rates and length of stay. Toolkits developed by the CDC include items such as adhering to proper hand hygiene protocols, and aseptic insertion techniques.  Mandated NHSN reporting is the basis for hospitals' data posted on public reporting websites such as Hospital Compare. Hospitals' use of NHSN data and/or the CDC's Targeted Assessment for Prevention Strategy (TAP) is a construct to measure hospitals' efforts to improve their infection rates.   
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; An additional unmeasured construct is electronic health record (EHR) use. EHR use is included as a confounder as literature has found use of an EHR system to be associated with decreased rates of CLABSIs. In two analyses, EHRs were found to increase the use of CLABSI checklist-related items.  One analysis found that hospitals could leverage their EHR system to improve surveillance of CAUTIs.  EHR compliance may be reflective of a hospital's financial resources, and literature has found that safety-net hospitals are significantly less likely to have a fully implemented EHR system. 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The last unmeasured construct is hospital staffing. Literature has identified hospitals' nurse staffing levels to be associated with patient outcomes. A study that examined nurse staffing in California hospitals after a mandate that dictated acceptable nurse to patient ratios was implemented found that most hospitals with the lowest nurse staffing level were safety-net. In addition, the study found that the safety-net hospitals that had the lowest staffing levels were significantly less likely to hire enough staff to meet the mandate after its first year.  An analysis of surgical outcomes at various hospitals found that hospitals with a lower number of Medicaid patient days were significantly more likely to have more hospitalists, privileged physicians, and full-time personnel. While this construct is unmeasured, it is hypothesized that hospitals that employ an adequate number of staff will be more likely to provide quality care in a timely manner, resulting in lower rates of healthcare-associated infections.
+
+**c. Measures**
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Safety-net hospitals have no formal definition, but recent studies have defined safety-net status using Medicare disproportionate-share hospital DSH payment percentage or Medicaid caseload. Safety-net hospitals are defined by DSH payment percentage as this is more reflective of a hospital's financial need than Medicaid caseload alone. This is because DSH payments take into account hospitals' Medicare and Medicare SSI days in addition to Medicaid days. Penalization by the HACRP, the outcome variable of interest, is expressed as a dichotomous variable with a 0 given to hospitals that are not penalized and 1 given to hospitals that receive a penalty.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Four important covariates, hospital teaching status, penalization by VBP and penalization by the HRRP are gathered from CMS's Inpatient Perspective Payment System's (IPPS). Teaching status is defined as a 0/1 dummy variable where 1 indicates a resident-to-bed ratio greater than 0. Penalization by pay-for-performance programs VBP and HRRP is indicated by 1 in a 0/1 dichotomous indicator. Penalization by more than one pay-for-performance program has been shown to impact safety-net hospitals and is of interest for this analysis as well. 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Despite risk adjustment for affiliation with a medical school, studies on pay-for-performance programs often examine how teaching hospitals are impacted. As literature has established this relationship, examination of hospital teaching status is of interest in this analysis. A hospital's resident to bed ratio will be used to establish hospital teaching status.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; As with hospital teaching status, hospital bed size will also be gathered from the IPPS and coded as a categorical variable. Categories for bed size will consist of small (< 100 beds), mid-size (100-399) and large (≥400 beds) hospitals, as done in previous literature.  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; As recent HCUP statistics indicate that 27% of safety-net hospitals are located in large central metropolitan areas, compared to 17.9% of non-safety-net hospitals, it is also necessary to examine whether a hospital is located in an urban or rural region. Hospitals are categorized into urban or rural region based upon classification by CMS.
+
+**d. Inclusion and Exclusion Criteria**
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Hospitals included in both analyses (penalization by HACRP and CAUTI and CLABSI rates) needed to be issued a score by the HACRP in all three years in order to be included in the analysis. This decision was made to create a consistent, balanced, panel as well as to mitigate any issues surrounding hospitals that dropped out of the sample due to mergers. To be eligible for the HACRP a hospital must be an acute care facility, participate in Medicare, have enough HAC cases to be eligible for reporting, and have no waiver of exemption for participation. Excluding those hospitals not scored by the HACRP in 2015-2017 resulted in a total of 3,127 hospitals per year  (a total of 9,381 hospitals.)
+
+
+##V. Results
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Dataset descriptive statistics are found in Table 1. Analytic plans involved subsetting hospitals penalized by the HACRP in 2015 and 2016  to find odds of subsequent penaliztion by safety-net status in 2016 and 2017, respectively. A third analysis was then conducted to examined the odds of penalization in all three years of the dataset by hospital safety-net status. Logistic regression results from the first subset, hospitals penalized in 2015, can be seen in Table 2. Table 2 shows that safety-net hospitals are not more likely to be penalized in 2016 than non-safety net hospitals, but teaching hospitals and hospitals fined by VBP are 1.54 and 1.29 times more likely to be penalized in 2016 after penalization in 2015, respectively. The teaching hospital result is in line with current literature and the VBP result is unsurprising as VBP uses many of the same metrics as the HACRP. Table 3 shows the odds of penaliztion in 2017 after penalization in 2016. Results show that safety-net hospitals are 1.90 times more likely to be fined in 2017 after being fined in 2016 than non-safety-net hospitals. Similar results are seen for teaching hospitals and hospitals fined through VBP. An analysis on odds of penalization in all three years of the dataset is shown in Table 4., and results show that safety-net hospitals are 2.31 times more likely to be penalized in all three years than non-safety-net hospitals.
+
+
+##VI. Discussion
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; As hypothesized, safety-net hospitals were more likely to be fined in 2017 after penalization in 2016, and more likely to be fined in all three years of the dataset than their non-safety-net counterparts. Contrary to these results, penalization in 2016 after 2015 penalization was not significantly greater for safety-net hospitals when compared to non-safety-net hospitals. It is possible that, in 2016, the policy was so new that hospitals' efforts to improve infection rates had not had enough time to create significant results, so differences across safety-net and non-safety-net hospitals were not yet detectable. By 2017, the HACRP had been in effect for two years and those hospitals with the resources to improve their infection rates had significant improvements. As safety-net hosiptals are often under-resourced this is a concerning result that should be monitored in the future. Future research should examine odds of repeated penalization in later years of the HACRP (2018 and 2019) to see if there is a continued trend of increased penalization of safety-net hospitals. It is important to ensure that policy is helping to close care disparities rather than widen them, so policymakers may need to re-evaluate the HACRP and its consequences.
+
+#VII. Tables
+
+```{r}
+library(knitr)
+```
+
+**Table 1. Descriptive Statistics 2015-2017**
+```{r}
+Descriptive_Statistics_2015_2017 <- tibble::tribble(
+  ~Variable,    ~Safety.Net., ~Non.Safety.Net,   ~P.Value,
+                                                 "Hospital Type", "2374 (25.31%)", "7007 (74.69%)",         NA,
+                                             "Teaching Hospital", "1056 (44.48%)", "2001 (28.56%)",  "0.00***",
+                                             "Small (<100 Beds)",  "613 (25.82%)", "2749 (39.23%)",  "0.00***",
+                                       "Mid-Size (100-399 Beds)", "1302 (54.84%)", "3614 (51.58%)", "0.01*** ",
+                                             "Large (>399 Beds)",  "459 (19.33%)",   "644 (9.19%)",  "0.00***",
+                                                "Urban Location", "1784 (75.15%)", "5268 (75.18%)",     "0.97",
+                                                "Fined by HACRP",  "693 (29.19%)", "1468 (20.95%)",  "0.00***",
+                                                  "Fined by VBP", "1239 (52.19%)", "2755 (39.32%)",  "0.00***",
+                                                 "Fined by HRRP", "2074 (87.36%)", "5530 (78.92%)",  "0.00***",
+                                                      "Mean CMI",          "1.51",          "1.56",  "0.00***"
+  )
+
+require(knitr)
+kable(Descriptive_Statistics_2015_2017, digits = 3, row.names = FALSE, align = "c",
+              caption = NULL)
+
+
+```
+
+
+
+**Table 2. Odds of Penalization in 2016 After Penalization in 2015**
+```{r}
+Fine_2016 <- tibble::tribble(
+  ~Variable,      ~OR,     ~SE,
+                                                   "Non-Safety-Net ",    "Ref",      "-",
+                                                        "Safety-Net",   "1.25", "0.127",
+                                             "Non-Teaching Hospital",    "Ref",      "-",
+                                                 "Teaching Hospital", "1.54**", "0.116",
+                                                 "Small (<100 Beds)",    "Ref",      "-",
+                                           "Mid-Size (100-399 Beds)",   "1.20", "0.139",
+                                                 "Large (>399 Beds)",  "1.65*", "0.203",
+                                                             "Rural",    "Ref",      "-",
+                                                             "Urban",  "0.992", "0.142",
+                                                              "HRRP", "0.71**", "0.125",
+                                                               "VBP", "1.29**", "0.098"
+  )
+
+require(knitr)
+kable(Fine_2016, digits = 3, row.names = FALSE, align = "c",
+              caption = NULL)
+
+```
+
+
+
+**Table 3. Odds of Penalization in 2017 After Penalization in 2016**
+
+```{r}
+Fine_2017 <- tibble::tribble(
+  ~Variable,      ~OR,     ~SE,
+                                                   "Non-Safety-Net ",    "Ref",      NA,
+                                                        "Safety-Net", "1.90**", "0.131",
+                                             "Non-Teaching Hospital",    "Ref",      "-",
+                                                 "Teaching Hospital",   "1.17", "0.116",
+                                                 "Small (<100 Beds)",    "Ref",      "-",
+                                           "Mid-Size (100-399 Beds)", "2.45**", "0.139",
+                                                 "Large (>399 Beds)", "2.51**", "0.201",
+                                                             "Rural",    "Ref",      "-",
+                                                             "Urban", "1.59**", "0.146",
+                                                              "HRRP", "0.96**", "0.121",
+                                                               "VBP", "1.09**", "0.100"
+  )
+
+require(knitr)
+kable(Fine_2017, digits = 3, row.names = FALSE, align = "c",
+              caption = NULL)
+
+```
+
+
+
+**Table 4 Odds of Penalization in All 3 Years (2015-2017)**
+```{r}
+Fine_All <- tibble::tribble(
+  ~Variable,      ~OR,     ~SE,
+                                                   "Non-Safety-Net ",    "Ref",      "-",
+                                                        "Safety-Net", "2.31**", "0.107",
+                                             "Non-Teaching Hospital",    "Ref",      "-",
+                                                 "Teaching Hospital", "1.99**", "0.098",
+                                                 "Small (<100 Beds)",    "Ref",      "-",
+                                           "Mid-Size (100-399 Beds)", "1.73**", "0.154",
+                                                 "Large (>399 Beds)", "2.38**", "0.188",
+                                                             "Rural",    "Ref",      "-",
+                                                             "Urban", "1.53**", "0.161",
+                                                              "HRRP",  "0.78*", "0.112",
+                                                               "VBP", "1.61**", "0.085"
+  )
+
+require(knitr)
+kable(Fine_All, digits = 3, row.names = FALSE, align = "c",
+              caption = NULL)
+
+```
+
+
